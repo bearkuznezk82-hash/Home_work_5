@@ -1,0 +1,157 @@
+books = [
+    {
+        "genre": "поэзия",
+        "number": "978-5-1000-1234-7",
+        "title": "Евгений Онегин",
+        "author": "Александр Пушкин",
+    },
+    {
+        "genre": "фэнтези",
+        "number": "88006",
+        "title": "Властелин колец",
+        "author": "Джон Р. Р. Толкин",
+    },
+    {
+        "genre": "детектив",
+        "number": "D-1122",
+        "title": "Безмолвный свидетель",
+        "author": "Агата Кристи",
+    },
+]
+
+directories = {"1": ["978-5-1000-1234-7", "88006"], "2": ["D-1122"], "3": []}
+
+
+def book_info(book, book_number):
+    res = filter(lambda number: number["number"] == book_number, books)
+    return list(res)
+
+
+def shelf(dir_num, book_title):
+    res = filter(lambda title: title["title"].lower() == book_title.lower(), books)
+    return list(res)
+
+
+def books_shelf(books, directories):
+    shelf_with_book = {shelf: nums for shelf, nums in directories.items() if nums}
+    for book in books:
+        for shelf, numbers in shelf_with_book.items():
+            if book["number"] in numbers:
+                print(
+                    f"№: {book['number']}, жанр: {book['genre']}, название: {book['title']}, автор: {book['author']}, полка хранения: {shelf}"
+                )
+                break
+
+
+def add_shelf():
+    shelf_num = input("Введите номер полки: ")
+    if shelf_num in directories:
+        print(
+            f'Такая полка уже существует. Текущий перечень полок: {", ".join(directories.keys())}'
+        )
+    else:
+        directories[shelf_num] = []
+        return print(f'Текущий перечень полок: {", ".join(directories.keys())}')
+
+
+def del_shelf():
+    shelf_num = input("Введите номер полки: ")
+    if directories[shelf_num] == []:
+        del directories[shelf_num]
+        print(f'Полка удалена. Текущий перечень полок: {", ".join(directories.keys())}')
+    else:
+        print(
+            f'На полке есть книги, удалите их перед удалением полки. Текущий перечень полок: {", ".join(directories.keys())}'
+        )
+
+
+def add_book():
+    number = input("Введите номер книги: ")
+    genre = input("Введите жанр книги: ")
+    title = input("Введите название книги: ")
+    author = input("Введите автора книги: ")
+    shelf = input("Введите полку для хранения: ")
+    if shelf in directories:
+        books.append(
+            {"genre": genre, "number": number, "title": title, "author": author}
+        )
+        directories[shelf].append(number)
+        print("Книга добавлена. Текущий список книг:")
+        books_shelf(books, directories)
+    else:
+        print("Такой полки не существует. Добавьте полку командой add_shelf.")
+
+
+def del_book():
+    number_to_delete = input("Введите номер книги: ")
+    for shelf, numbers in directories.items():
+        if number_to_delete in numbers:
+            directories[shelf].remove(number_to_delete)
+            for book in books:
+                if book["number"] == number_to_delete:
+                    books.remove(book)
+                    print("Книга удалена.")
+                    print("Текущий список книг:")
+                    books_shelf(books, directories)
+                    break
+        else:
+            print("Книга не найдена в базе.")
+            print("Текущий список книг:")
+            books_shelf(books, directories)
+
+
+def move():
+    book_number = input("Введите номер книги: ")
+    target_shelf = input("Введите номер полки: ")
+    source_shelf = None
+    for shelf, numbers in directories.items():
+        if book_number in numbers:
+            source_shelf = shelf
+            break
+    if source_shelf is None:
+        print("Книга не найдена в базе")
+        print("Текущий список книг:")
+        books_shelf(books, directories)
+    elif shelf not in directories:
+        print(
+            f'Такой полки не существует. Текущий перечень полок: {", ".join(directories.keys())}'
+        )
+    else:
+        directories[source_shelf].remove(book_number)
+        directories[target_shelf].append(book_number)
+        print("Книга перемещена.")
+        print("Текущий список документов:")
+        books_shelf(books, directories)
+
+
+command = ""
+while command != "q":
+    command = input("Введите команду: ")
+    if command == "book_info":
+        book_number = input("Введите номер книги: ")
+        if book_info(books, book_number) != []:
+            print(
+                f"""#Название книги: {book_info(books,  book_number)[0]['title']}
+Автор: {book_info(books,  book_number)[0]['author']}"""
+            )
+        else:
+            print("Книга не найдена в базе")
+    elif command == "shelf":
+        book_title = input("Введите название книги: ")
+        if shelf(directories, book_title) != []:
+            book_number = shelf(directories, book_title)[0]["number"]
+            for i in directories.items():
+                if book_number in (i[1]):
+                    print(f"Книга хранится на полке: {i[0]}")
+        else:
+            print("Книга не найдена в базе")
+    elif command == "all":
+        books_shelf(books, directories)
+    elif command == "add_shelf":
+        add_shelf()
+    elif command == "del_shelf":
+        del_shelf()
+    elif command == "add_book":
+        add_book()
+    elif command == "del_book":
+        del_book()
