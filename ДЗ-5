@@ -50,8 +50,8 @@ def add_shelf():
             f'Такая полка уже существует. Текущий перечень полок: {", ".join(directories.keys())}'
         )
     else:
-        directories[shelf_num] = []
-        return print(f'Текущий перечень полок: {", ".join(directories.keys())}')
+        directories.setdefault(shelf_num, [])
+        return print(f'Полка добавлена. Текущий перечень полок: {", ".join(directories.keys())}')
 
 
 def del_shelf():
