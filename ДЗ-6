@@ -1,5 +1,5 @@
 import json
-#задание 1
+
 content = {}
 with open('purchase_log.txt') as f:
   for line in   f:
@@ -10,9 +10,10 @@ with open('purchase_log.txt') as f:
     content[user_id] = category
 
 
-#задание 2
 with open('visit_log.csv') as f:
   with open('funnel.csv', 'w') as f2:
     for line in f:
-      if 'None' not in line:        
-        f2.write(line)
+      user_id = line.strip().split(',')[0]
+      if user_id in content:
+          category = content[user_id]
+          f2.write(f"{line.strip()},{category}\n")
